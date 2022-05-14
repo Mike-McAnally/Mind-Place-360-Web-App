@@ -7,6 +7,7 @@ Moments whch can be replayed, memories recalled. I call it Mind Place because it
 
 To find out more in a detailed article explaining the code see:
 
+https://michael-mcanally.medium.com/my-360-mind-place-web-app-for-caputuring-immersive-vr-moments-free-open-source-code-295e4f9fbdf0
 
 To see a DEMO example of it in in action:  (best viewed in the Meta Quest 2 browser, or on a desktop in Chrome or FireFox browsers)
 
