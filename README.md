@@ -1,6 +1,6 @@
 # Mind Place 360 Web App
 
-![alt text](https://github.com/Mike-McAnally/Mind-Place-360-Web-App/blob/menuImage.JPG?raw=true)
+!(https://github.com/Mike-McAnally/Mind-Place-360-Web-App/blob/menuImage.JPG?raw=true)
 
 I've have had a 360 degree camera for a while now. Also, I have a Oculus Quest 2 VR headset (or now Meta Quest 2).
 
