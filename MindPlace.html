@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,shrink-to-fit=no,user-scalable=no,maximum-scale=1,minimum-scale=1">
+    <title>Mind Place 360 - VR space loading, please wait</title>
+    <meta name="description" content="This is a 360 degree photo and video structured user interface for VR headsets and desktops. Tuned for Quest 2."></meta>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+
+    <!-- A-frame component libraries -->
+    <script src="aframePACKAGE/aframe-v1.1.0.min.js"></script>
+    <script src="aframePACKAGE/aframe-rounded-component.min.js"></script>
+    <script src="aframePACKAGE/aframe-text-geometry-component.min.js"></script>
+    <script src="aframePACKAGE/aframe-extras.min.js"></script>
+    <script src="aframePACKAGE/aframe-layout-component.min.js"></script>
+
+    <script type="text/javascript">
+
+      // Set to true if you want photo labels to be spoken when onmouseenter=. User must have clicked first once to initiate audio context (unfortunate, but browsers require now)
+      // Does not presently work on Oculus browser, but does in Chrome desktop browser
+      var Speech = false;
+      var audio1 = new Audio('assets/wav/action.wav');
+      var audio2 = new Audio('assets/wav/swoosh.wav');
+
+      var not360video = false;
+
+      function speakInfo(narration) {
+
+        var audio_msg = new SpeechSynthesisUtterance(narration);
+
+        if (Speech === true) {
+            window.speechSynthesis.speak(audio_msg);
+        }
+      }
+
+      function changeOrb(orb_num) {
+
+        // change our orb sky
+        document.getElementById('orbSky').setAttribute('material', 'src: #orb' + orb_num.toString());
+      }
+
+      function sqrImg(imgNum) {
+
+        // Make the 2D Popup image visible
+        document.getElementById('orb_2Dimg' + imgNum).setAttribute('visible', true);
+
+        // Make the location label visible
+        document.getElementById('OrbName_place' + imgNum).setAttribute('visible', true);
+
+      }
+
+      function dspImg(dimgNum) {
+
+        // Make the 2D Popup image invisible
+        document.getElementById('orb_2Dimg' + dimgNum).setAttribute('visible', false);
+
+        // Make the location label invisible
+        document.getElementById('OrbName_place' + dimgNum).setAttribute('visible', false);
+
+      }
+
+
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+
+                if(!playing) {
+                    audio.play();
+                    playing = true;
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    playing = false;
+                }
+            });
+        }
+      })
+
+      function playSwoosh() {
+        audio2.play();
+      }
+
+
+      function playBlip() {
+        audio1.play();
+      }
+
+
+      function playSound() {
+
+        //alert("TEST Sound playing functional!!!");
+      }
+
+
+      function play360() {
+
+          document.getElementById('vrVideo360').setAttribute('visible', true);
+          document.getElementById('orbSky').setAttribute('visible', false);
+
+          // to set specific time of video
+          //document.querySelector("#video-src").components.material.data.src.currentTime = 0 // start of video
+
+          // to play the videosphere
+          document.querySelector("#video-src").components.material.material.map.image.play();
+
+          // it is a 360 video so we make sure video screen is off because using a-videosphere instead
+          document.getElementById('video-screen').setAttribute('visible', false);
+          
+      }
+
+      function STOPplay360() {
+
+        // The user will need to pause their own video as audio will play in background while we return to another still 360 degree Orb that was selected...  music can continue to play as well if it was selected
+
+          document.getElementById('vrVideo360').setAttribute('visible', false);
+          document.getElementById('orbSky').setAttribute('visible', true);
+
+      }
+
+  </script>
+
+  </head>
+  <body>
+
+    <button id="playButton" type="button">Play Music</button>
+    <audio id="playAudio" autoplay loop>
+        <source src="assets/wav/Sky.wav" type="audio/mpeg">
+    </audio>
+
+    <a-scene background="color: #FAFAFA" raycaster="objects: .clickable">
+
+      <a-assets timeout="29000">
+
+        <!-- mixin used to animate selected  orbs  -->
+        <a-mixin id="marble" geometry="primitive: sphere" scale=".45 .45 .45" animation__rotation="startEvents: mouseenter; pauseEvents: mouseleave; resumeEvents: mouseenter; property: rotation; to: 0 360 0; loop: true; dur: 10000" animation__mouseenter="startEvents: mouseenter; pauseEvents: mouseleave; resumeEvents: mouseenter; property: components.material.material.color; type: color; to: white;  dur: 500; " animation__mouseleave="property: components.material.material.color; type: color; to: gray; startEvents: mouseleave; dur: 500;" shadow ></a-mixin>
+
+        <!-- Instructions for adjustment -->
+        <!-- Replace with eight 360 degree photo images of your choosing placed in images360 directory of Mind Palace structure -->
+        <!-- Eight images seem to be about the max, which will take some time to load.  However if you have less images, say 4 =, best to remove orb5-orb8.  -->
+        <!-- You will then need to remove (comment out) orbthumb5-orthumb8 and img2D5-img2D8 as well as OrbName_place5-OrbName_place8, orb_2Dimg5-orb_2Dimg8  -->
+        <!-- Make sure to adjust the  text-geometry, speakInfo and NodeName values to your VR location specifics -->
+
+        <img crossorigin="anonymous" id="orb1" src="images360/nb1.JPG">
+        <img crossorigin="anonymous" id="orb2" src="images360/nb2.JPG">
+        <img crossorigin="anonymous" id="orb3" src="images360/nb3.JPG">
+        <img crossorigin="anonymous" id="orb4" src="images360/nb4.JPG">
+        <img crossorigin="anonymous" id="orb5" src="images360/nb6.JPG">
+        <img crossorigin="anonymous" id="orb6" src="images360/nb8.JPG">
+        <img crossorigin="anonymous" id="orb7" src="images360/nb9.JPG">
+        <img crossorigin="anonymous" id="orb8" src="images360/nb10.JPG">
+
+        <!-- Replace with eight thumbnail orbs corresponding to the 360 images above to be wrapped around each orb size 512 w x 256 h -->
+        <img crossorigin="anonymous" id="orbthumb1" src="orbthumb/nb1.JPG">
+        <img crossorigin="anonymous" id="orbthumb2" src="orbthumb/nb2.JPG">
+        <img crossorigin="anonymous" id="orbthumb3" src="orbthumb/nb3.JPG">
+        <img crossorigin="anonymous" id="orbthumb4" src="orbthumb/nb4.JPG">
+        <img crossorigin="anonymous" id="orbthumb5" src="orbthumb/nb6.JPG">
+        <img crossorigin="anonymous" id="orbthumb6" src="orbthumb/nb8.JPG">
+        <img crossorigin="anonymous" id="orbthumb7" src="orbthumb/nb9.JPG">
+        <img crossorigin="anonymous" id="orbthumb8" src="orbthumb/nb10.JPG">
+
+        <!-- Replace with eight 2D images corresponding to the 360 images size 341 w x 256 h -->
+        <img crossorigin="anonymous" id="img2D1" src="img2D/nb1.JPG">
+        <img crossorigin="anonymous" id="img2D2" src="img2D/nb2.JPG">
+        <img crossorigin="anonymous" id="img2D3" src="img2D/nb3.JPG">
+        <img crossorigin="anonymous" id="img2D4" src="img2D/nb4.JPG">
+        <img crossorigin="anonymous" id="img2D5" src="img2D/nb6.JPG">
+        <img crossorigin="anonymous" id="img2D6" src="img2D/nb8.JPG">
+        <img crossorigin="anonymous" id="img2D7" src="img2D/nb9.JPG">
+        <img crossorigin="anonymous" id="img2D8" src="img2D/nb10.JPG">
+
+        <!-- Replace with floor patten to cover tripod.  In floorCovering bellow set Opacity = 1 to make visible -->
+        <img crossorigin="anonymous" id="floor" src="assets/floor/paleFloor.jpg"> 
+
+        <!-- Replace MP4 video with your own  -->
+        <video crossorigin="anonymous" id="video-src" autoplay loop="true" src="video/nb.mp4"></video>
+        
+        <!-- Our 3D font -->
+        <a-asset-item id="optimer_bold" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+        <!-- Controls for the video player -->
+        <img crossorigin="anonymous" src="assets/img/play2.png" id="play" >
+        <img crossorigin="anonymous" src="assets/img/pause.png" id="pause" >
+        <img crossorigin="anonymous" src="assets/img/volume-normal.png" id="volume-normal" >
+        <img crossorigin="anonymous" src="assets/img/volume-mute.png" id="volume-mute" >
+        <img crossorigin="anonymous" src="assets/img/seek-back.png" id="seek-back" >
+
+        <!-- Music toggle control -->
+        <img crossorigin="anonymous" id="music-image_on" src="assets/img/music.png">
+
+      </a-assets>
+
+      <!-- Set first screen environment to Orb1 -->
+      <a-sky id="orbSky" material="src: #orb1" rotation="0 -90 0" ></a-sky>
+
+      <!-- Our spherical video screen for the video --> 
+      <a-videosphere id="vrVideo360" rotation="0 -75 0" src="#video-src" visible="false" >
+      </a-videosphere>
+
+      <!-- Title of the Mind Palace  -->
+      <a-entity id="NodeName" position="-2.565 -2.102 -2.84702" rotation="-39.4 0 0" text-geometry="value: Noisebridge, 272 Capp Street, San Francisco, CA; opacity: .5; size: .175; font: #optimer_bold" material="color: #F4A460"></a-entity>
+
+      <!-- Basic movement and selection, allows for movement of menu and controls if they obstruct view with WASD keys or arrows or VR controllers   -->
+      <a-entity id="cameraRig" movement-controls="" position="0 0 2" rotation="0 0 0">
+        <!-- camera -->
+        <a-entity id="head" camera="active: true" look-controls position="0 1.6 0" ></a-entity>
+
+        <a-entity class="leftController" hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" visible="true"></a-entity>
+         
+        <a-entity class="rightController" hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;" line="color: lawngreen; opacity: 0.5" visible="true"></a-entity>
+
+      </a-entity>
+
+      <!-- This lets us play music if browser allows it, enable audio  -->
+      <a-box id="playButton" class="clickable" position="0.80475 -0.87 -4.32442" rotation="-27.121 0 0" material="src: #music-image_on" scale="0.25 0.25 0.25" onclick="playBlip();" audiohandler shadow ></a-box>
+
+      <!-- Video Label  
+      <a-entity id="VideoLabel" class="clickable" position="-0.40113 -0.598 -4.5" rotation="-24.697 0 0" text-geometry="value: Beach 360 Video; opacity: .5; size: 0.09; font: #optimer_bold" onclick="playBlip();speakInfo('Beach 360 Degree Video');" material="color: #F4A460"></a-entity>
+-->
+
+      <!-- Replace labels for the orbs if you want them  -->
+      <a-entity id="OrbName_place1" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 1; size: 0.12; font: #optimer_bold" material="color: #F4A460" visible="false"></a-entity>
+      <a-entity id="OrbName_place2" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 2; size: 0.12; font: #optimer_bold" material="color: #F4A460" visible="false"></a-entity>
+      <a-entity id="OrbName_place3" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 3; size: 0.12; font: #optimer_bold" material="color: #F4A460" visible="false"></a-entity>
+      <a-entity id="OrbName_place4" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 4; size: 0.12; font: #optimer_bold" material="color: #F4A460" visible="false"></a-entity>
+      <a-entity id="OrbName_place5" material="color: #F4A460" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 5; size: 0.12; font: #optimer_bold" visible="false"></a-entity>
+      <a-entity id="OrbName_place6" material="color: #F4A460" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 6; size: 0.12; font: #optimer_bold" visible="false"></a-entity>
+      <a-entity id="OrbName_place7" material="color: #F4A460" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 7; size: 0.12; font: #optimer_bold" visible="false"></a-entity>
+      <a-entity id="OrbName_place8" material="color: #F4A460" position="-0.4595 1.53696 -4.5" rotation="-24.697 0 0" text-geometry="value: Noisebridge Photo 8; size: 0.12; font: #optimer_bold" visible="false"></a-entity>
+
+      <!-- Popup 2D images of "primary view" (the most dramatic view for visually descriptive purposes of 2D) on the 3D Orb -->
+      <a-plane id="orb_2Dimg1" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D1" visible="false"></a-plane>
+      <a-plane id="orb_2Dimg2" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D2"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg3" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D3"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg4" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D4"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg5" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D5"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg6" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D6"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg7" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D7"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg8" position="0.00557 0.479 -4.5" scale="2.168 1.8 0.1" rotation="0 0 0" material="src: #img2D8"  visible="false"></a-plane>
+
+<!--  -->
+      <a-plane id="floorCovering" position="0.00557 -58 0" scale="85 85 0.1" rotation="-90 0 90" material="src: #floor"  visible="true" opacity="0"></a-plane>
+
+      <!-- Translucent base for orbs 
+      <a-rounded radius="0.1" top-left-radius="0.6" top-right-radius="0.6" bottom-left-radius="0.6" bottom-right-radius="0.6" position="-2.667 -2.20165 -4.13398" scale="0.661 0.218 0.00001" rotation="-50 0 0" width="8" height="8" color="#657383" opacity=".35" shadow="" rounded=""></a-rounded>
+-->
+
+      <!-- Controls for display of video screen, seems to work nicely, javascript below </scene> tag below -->
+     
+          <!-- MEDIAS HOLDER -->
+          <a-sound id="alert-sound" src="src: url(assets/wav/action.wav)" autoplay="false" position="0 0 0"></a-sound>
+          <a-video id="video-screen" src="#video-src" position="0.00193 1.02935 -5.4166" rotation="0 0 0" scale="0.564 0.697 1" width="8" height="4" rotation="0 0 0" visible="false"></a-video>
+
+          <!-- END MEDIAS HOLDER -->
+
+          <!-- CONTROLS -->
+          <a-image class="clickable" id="control-back" width="0.4" height="0.4" src="#seek-back" position="-0.426 -0.92581 -4.49178" rotation="0 0 0" visible="true" scale="0.85 0.85 0.85"></a-image>
+
+          <a-image class="clickable" id="control-play" width="0.4" height="0.4" src="#play" position="-0.015 -0.92581 -4.49178" rotation="0 0 0" onclick="play360();"></a-image>
+
+          <a-image class="clickable" id="control-volume" width="0.4" height="0.4" src="#volume-mute" position="0.42174 -0.92581 -4.49178" rotation="0 0 0" visible="true" scale="0.75 0.75 0.75"></a-image>
+
+          <!-- END CONTROLS -->
+
+          <!-- PROGRESSBAR -->
+          <a-entity id="progress-bar" geometry="primitive:plane;height:0.1;width:4" material="opacity:0;transparent:true;visible:false" position="0.03516 -0.934 -5.48963" rotation="0 0 0">
+            <a-plane id="progress-bar-track" width="4" height="0.1" color="gray" position="" opacity="0.2" visible="false" material="" geometry=""></a-plane>
+            <a-plane id="progress-bar-fill" width="3.0772968174269693" height="0.1" color="#7198e5" position="-0.4613515912865154 0 0.01438" geometry="" visible="false" material=""></a-plane>
+          </a-entity>
+          <!-- END PROGRESSBAR -->
+
+      <a-entity layout="type: circle; radius: 2.5" position="0 0 -5">
+      
+      <!-- Actual orbs and there rotation, play speech discription if you want to.  Set Speech to true.  -->
+      <a-sphere id="orb_place1" class="clickable" mixin="marble" rotation="0 -125 0" material="src: #orbthumb1" onclick="playSwoosh();changeOrb(1);STOPplay360();"  onmouseenter="sqrImg(1);speakInfo('Photo 1');" onmouseleave="dspImg(1);"></a-sphere>
+      <a-sphere id="orb_place2" class="clickable" mixin="marble" rotation="0 85 0" material="src: #orbthumb2" onclick="playSwoosh();changeOrb(2);STOPplay360();"  onmouseenter="sqrImg(2);speakInfo('Photo 2');" onmouseleave="dspImg(2);"></a-sphere>
+      <a-sphere id="orb_place3" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb3" onclick="playSwoosh();changeOrb(3);STOPplay360();"  onmouseenter="sqrImg(3);speakInfo('Photo 3');" onmouseleave="dspImg(3);"></a-sphere>
+      <a-sphere id="orb_place4" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb4" onclick="playSwoosh();changeOrb(4);STOPplay360();"  onmouseenter="sqrImg(4);speakInfo('Photo 4');" onmouseleave="dspImg(4);"></a-sphere>
+      <a-sphere id="orb_place5" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb5" onclick="playSwoosh();changeOrb(5);STOPplay360();"  onmouseenter="sqrImg(5);speakInfo('Photo 5');" onmouseleave="dspImg(5);"></a-sphere>
+      <a-sphere id="orb_place6" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb6" onclick="playSwoosh();changeOrb(6);STOPplay360();"  onmouseenter="sqrImg(6);speakInfo('Photo 6');" onmouseleave="dspImg(6);"></a-sphere>
+      <a-sphere id="orb_place7" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb7" onclick="playSwoosh();changeOrb(7);STOPplay360();"  onmouseenter="sqrImg(7);speakInfo('Photo 7');" onmouseleave="dspImg(7);"></a-sphere>
+      <a-sphere id="orb_place8" class="clickable" mixin="marble" rotation="0 45 0" material="src: #orbthumb8" onclick="playSwoosh();changeOrb(8);STOPplay360();"  onmouseenter="sqrImg(8);speakInfo('Photo 8');" onmouseleave="dspImg(8);"></a-sphere>
+      </a-entity>
+
+    </a-scene>
+
+    <!-- A Video Player Script (still works, when permissions enabled) -->
+    <script type="text/javascript">
+
+    // Is a VR Headset connected at this moment?
+    if (!AFRAME.utils.device.checkHeadsetConnected()) {
+
+      //No, So let them have the mouse cursor
+      //cursor="rayOrigin:mouse"
+        document.getElementsByTagName("a-scene")[0].setAttribute("cursor", "rayOrigin:mouse");
+    
+    }
+  
+
+    //Google Code for un-audio mute
+    // Existing code unchanged.
+    window.onload = function() {
+      var context = new AudioContext();
+
+    }
+
+    // One-liner to resume playback when user interacted with the page.
+    document.querySelector('button').addEventListener('click', function() {
+      context.resume().then(() => {
+        console.log('Playback resumed successfully');
+      });
+    });
+
+      var AVideoPlayer = function() {
+      // Vals
+      this.duration         = 0;
+      this.current_progress = 0;
+      this.progressWidth    = 4;
+      this.paused           = true;
+      // Elems
+      this.elProgressBar   = null;
+      this.elProgressTrack = null;
+      this.elProgressFill  = null;
+      this.elAlertSound    = null;
+      this.elVideo         = null;
+      this.elVideoScreen   = null;
+      this.elControlBack   = null;
+      this.elControlPlay   = null;
+      this.elControlVolume = null;
+      this._initElements = function() {
+        this.elProgressBar   = document.getElementById('progress-bar');
+        this.elProgressTrack = document.getElementById('progress-bar-track');
+        this.elProgressFill  = document.getElementById('progress-bar-fill');
+        this.elAlertSound    = document.getElementById('alert-sound');
+        this.elVideo         = document.getElementById('video-src');
+        this.elVideoScreen   = document.getElementById('video-screen');
+        this.elControlBack   = document.getElementById('control-back');
+        this.elControlPlay   = document.getElementById('control-play');
+        this.elControlVolume = document.getElementById('control-volume');
+      }
+
+
+      /**
+      * PROGRESS
+      */  
+      this.setProgress = function(progress) {
+        var new_progress = this.progressWidth*progress;
+        this._setProgressWidth(new_progress);
+        var progress_coord = this._getProgressCoord();
+        if (progress_coord != undefined) {
+         progress_coord.x = -(this.progressWidth-new_progress)/2;
+         this._setProgressCoord(progress_coord);
+        }
+      }
+      this._getProgressCoord = function() {
+        return AFRAME.utils.coordinates.parse(this.elProgressFill.getAttribute("position"))
+      }
+      this._getProgressWidth = function() {
+        return parseFloat(this.elProgressFill.getAttribute("width"));
+      }
+      this._setProgressCoord = function(coord) {
+        this.elProgressFill.setAttribute("position", coord);
+      }
+      this._setProgressWidth = function(width) {
+        this.elProgressFill.setAttribute("width", width);
+      }
+
+
+      /*
+      * UI SETTERS
+      */
+      this.isProgressBarVisible = function(isVisible) {
+        this.elProgressTrack.setAttribute("visible", isVisible);
+        this.elProgressFill.setAttribute("visible", isVisible);
+      }
+      this.isControlVisible = function(isVisible) {
+        this.elControlBack.setAttribute("visible", isVisible);
+        this.elControlVolume.setAttribute("visible", isVisible);
+          if (not360video) {
+            this.elVideoScreen.setAttribute("visible", isVisible);
+          }
+      }
+
+
+      /*
+      * EVENTS
+      */
+      this._addPlayerEvents = function() {
+        var that = this;
+        this.elVideo.pause();
+        this.elVideo.onplay = function() {
+          that.duration = this.duration;
+        }
+        this.elVideo.ontimeupdate = function() {
+          if (that.duration > 0) {
+            that.current_progress = this.currentTime/that.duration;
+          }
+          that.setProgress(that.current_progress);
+        }
+      }
+      this._addControlsEvent = function() {
+        var that = this;
+        this.elControlPlay.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.paused) {
+            this.setAttribute('src', '#pause');
+            that.elVideo.play();
+            that.paused = false;
+            that.isProgressBarVisible(true);
+            that.isControlVisible(true);
+          } else {
+            this.setAttribute('src', '#play');
+            that.elVideo.pause();
+            that.paused = true;
+            that.isProgressBarVisible(false);
+            that.isControlVisible(false);
+         }
+        });
+        this.elControlVolume.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.muted) {
+            that.elVideo.muted = false;
+            this.setAttribute('src', '#volume-normal');
+          } else {
+            that.elVideo.muted = true;
+            this.setAttribute('src', '#volume-mute');
+          }
+        });
+        this.elControlBack.addEventListener('click', function () {
+          that._playAudioAlert();
+          that.elVideo.currentTime = 0;
+        });
+      }
+      this._addProgressEvent = function() {
+        var that = this;
+        this.elProgressBar.addEventListener('click', function (e) {
+          if (e.detail == undefined || e.detail.intersection == undefined || that.duration === 0) {
+            return;
+          }
+          let seekedPosition = (e.detail.intersection.point.x+(that.progressWidth/2))/that.progressWidth;
+          try {
+            let seekedTime = seekedPosition*that.duration;
+            that.elVideo.currentTime = seekedTime;
+          } catch (e) {
+          }
+        });
+      }
+      this._playAudioAlert = function() {
+        if (this.elAlertSound.components !== undefined && this.elAlertSound.components.sound !== undefined) {
+         this.elAlertSound.components.sound.playSound();
+        }
+      }
+
+      /**
+      * MOBILE PATCH TO PLAY VIDEO
+      */
+      this._mobileFriendly = function() {
+        if (AFRAME.utils.device.isMobile()) {
+          var that = this;
+          let video_permission        = document.getElementById('video-permission');
+         let video_permission_button = document.getElementById('video-permission-button');
+          video_permission.style.display = 'block';
+          video_permission_button.addEventListener("click", function() {
+            video_permission.style.display = 'none';
+            that.elVideo.play();
+            that.elVideo.pause();
+          }, false);
+        }
+      }
+      this.init = function() {
+        this._initElements();
+        //this._determinateProgressWidth();
+        this.setProgress(this.current_progress);
+        this._addPlayerEvents();
+        this._addControlsEvent();
+        this._addProgressEvent();
+        this._mobileFriendly();
+      }
+      this.init();
+    }
+      let scene = document.querySelector('a-scene');
+      var cursor = document.querySelector('a-cursor');
+
+      /**
+      * CINEMA MODE
+      */
+      scene.lightOff = function() {
+        //scene.islightOn = true;
+        //scene.removeAttribute('animation__fogback');
+        //scene.setAttribute('animation__fog', "property: fog.color; to: #0c192a; dur: 800; easing: easeInQuad;");
+      }
+      scene.lightOn = function() {
+        //scene.islightOn = false;
+        //scene.removeAttribute('animation__fog');
+        //scene.setAttribute('animation__fogback', "property: fog.color; to: #dbdedb; dur: 800");
+      }
+
+      /**
+      * AVideoPlayer
+      */     
+      var videoPlayer = new AVideoPlayer();
+      document.querySelector('#control-play').addEventListener('click', function () {
+        //if (videoPlayer.paused) {
+          //scene.lightOn()
+        //} else {
+          //scene.lightOff();
+        //}
+      });
+
+    </script>
+  </body>
+</html>
