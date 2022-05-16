@@ -18,4 +18,6 @@ https://rocketvirtual.com/MP/indexMike.html
 
 Please note: Be patient! That is because this data is coming over the internet and not preloaded as in a pre-game install. It will take some time to load. 360 data is much larger than 2D data. So imagine a cube with 6 sides, top, bottom and all around. Or imagine an additional axis in the Cartesian coordinate system in three dimensions, so not just x, y, but z-axis as well. The fortunate thing is that caching will occur in the browser after your first load, so impovement of revisitation loading times should actually occur if your browser can cache large file sizes. Otherwise reduce the number of 360 images being downloaded inside each HTML page of the web app to improve the over all wait time for the user experience. I found that eight and less 360 images is about the longest time people are willing to wait for a page to load. Having a fast internet or "intranet/LAN connection" really helps improve the experience.
 
-You can follow more of my VR projects at https://rocketvirtual.com/
+Here is a zip file of the entire sample structure with audio and video included.  Modify and customize with your own 360 data. https://rocketvirtual.com/MindPlace360App.zip
+
+You can also follow more of my VR projects at https://rocketvirtual.com/
